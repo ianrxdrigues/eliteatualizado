@@ -1,0 +1,71 @@
+2024-11-21 00:25:13,606 - INFO - Script de automação iniciado.
+2024-11-21 00:25:13,646 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.42.50:8080
+2024-11-21 00:25:13,647 - INFO - [33mPress CTRL+C to quit[0m
+2024-11-21 00:25:13,649 - INFO -  * Restarting with stat
+2024-11-21 00:25:14,248 - INFO - Script de automação iniciado.
+2024-11-21 00:25:14,271 - WARNING -  * Debugger is active!
+2024-11-21 00:25:14,275 - INFO -  * Debugger PIN: 136-421-835
+2024-11-21 00:25:39,058 - INFO - 127.0.0.1 - - [21/Nov/2024 00:25:39] "[35m[1mGET / HTTP/1.1[0m" 500 -
+2024-11-21 00:25:39,114 - INFO - 127.0.0.1 - - [21/Nov/2024 00:25:39] "[36mGET /?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2024-11-21 00:25:39,119 - INFO - 127.0.0.1 - - [21/Nov/2024 00:25:39] "[36mGET /?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2024-11-21 00:25:39,164 - INFO - 127.0.0.1 - - [21/Nov/2024 00:25:39] "GET /?__debugger__=yes&cmd=resource&f=console.png&s=UjWKD9J0ITztjgeBYbfr HTTP/1.1" 200 -
+2024-11-21 00:25:39,177 - INFO - 127.0.0.1 - - [21/Nov/2024 00:25:39] "[36mGET /?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-11-21 00:25:39,517 - INFO - 127.0.0.1 - - [21/Nov/2024 00:25:39] "[35m[1mGET / HTTP/1.1[0m" 500 -
+2024-11-21 00:25:39,535 - INFO - 127.0.0.1 - - [21/Nov/2024 00:25:39] "[36mGET /?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2024-11-21 00:25:39,536 - INFO - 127.0.0.1 - - [21/Nov/2024 00:25:39] "[36mGET /?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2024-11-21 00:25:39,567 - INFO - 127.0.0.1 - - [21/Nov/2024 00:25:39] "[36mGET /?__debugger__=yes&cmd=resource&f=console.png&s=UjWKD9J0ITztjgeBYbfr HTTP/1.1[0m" 304 -
+2024-11-21 00:25:39,575 - INFO - 127.0.0.1 - - [21/Nov/2024 00:25:39] "[36mGET /?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-11-21 00:25:40,421 - INFO - 127.0.0.1 - - [21/Nov/2024 00:25:40] "[35m[1mGET / HTTP/1.1[0m" 500 -
+2024-11-21 00:25:40,437 - INFO - 127.0.0.1 - - [21/Nov/2024 00:25:40] "[36mGET /?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2024-11-21 00:25:40,440 - INFO - 127.0.0.1 - - [21/Nov/2024 00:25:40] "[36mGET /?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2024-11-21 00:25:40,457 - INFO - 127.0.0.1 - - [21/Nov/2024 00:25:40] "[36mGET /?__debugger__=yes&cmd=resource&f=console.png&s=UjWKD9J0ITztjgeBYbfr HTTP/1.1[0m" 304 -
+2024-11-21 00:25:40,465 - INFO - 127.0.0.1 - - [21/Nov/2024 00:25:40] "[36mGET /?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-11-21 00:25:41,191 - INFO - 127.0.0.1 - - [21/Nov/2024 00:25:41] "[35m[1mGET / HTTP/1.1[0m" 500 -
+2024-11-21 00:25:41,208 - INFO - 127.0.0.1 - - [21/Nov/2024 00:25:41] "[36mGET /?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2024-11-21 00:25:41,214 - INFO - 127.0.0.1 - - [21/Nov/2024 00:25:41] "[36mGET /?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2024-11-21 00:25:41,229 - INFO - 127.0.0.1 - - [21/Nov/2024 00:25:41] "[36mGET /?__debugger__=yes&cmd=resource&f=console.png&s=UjWKD9J0ITztjgeBYbfr HTTP/1.1[0m" 304 -
+2024-11-21 00:25:41,247 - INFO - 127.0.0.1 - - [21/Nov/2024 00:25:41] "[36mGET /?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-11-21 00:25:41,597 - INFO - 127.0.0.1 - - [21/Nov/2024 00:25:41] "[35m[1mGET / HTTP/1.1[0m" 500 -
+2024-11-21 00:25:41,612 - INFO - 127.0.0.1 - - [21/Nov/2024 00:25:41] "[36mGET /?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2024-11-21 00:25:41,619 - INFO - 127.0.0.1 - - [21/Nov/2024 00:25:41] "[36mGET /?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2024-11-21 00:25:41,635 - INFO - 127.0.0.1 - - [21/Nov/2024 00:25:41] "[36mGET /?__debugger__=yes&cmd=resource&f=console.png&s=UjWKD9J0ITztjgeBYbfr HTTP/1.1[0m" 304 -
+2024-11-21 00:25:41,649 - INFO - 127.0.0.1 - - [21/Nov/2024 00:25:41] "[36mGET /?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-11-21 00:26:06,705 - INFO - Script de automação iniciado.
+2024-11-21 00:26:06,737 - WARNING -  * Debugger is active!
+2024-11-21 00:26:06,741 - INFO -  * Debugger PIN: 102-498-375
+2024-11-21 00:26:47,189 - INFO - Script de automação iniciado.
+2024-11-21 00:26:47,235 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.42.50:8080
+2024-11-21 00:26:47,235 - INFO - [33mPress CTRL+C to quit[0m
+2024-11-21 00:26:47,237 - INFO -  * Restarting with stat
+2024-11-21 00:26:47,824 - INFO - Script de automação iniciado.
+2024-11-21 00:26:47,844 - WARNING -  * Debugger is active!
+2024-11-21 00:26:47,848 - INFO -  * Debugger PIN: 136-421-835
+2024-11-21 00:29:48,283 - INFO -  * Detected change in 'C:\\Users\\Ian Rodrigues\\Documents\\comenttspro\\automacaocoments\\automacao\\x.py', reloading
+2024-11-21 00:29:48,347 - INFO -  * Restarting with stat
+2024-11-21 00:38:22,674 - INFO - Script de automação iniciado.
+2024-11-21 00:38:22,674 - INFO - Tarefa carregada: Link=https://vm.tiktok.com/ZMhWHykd4/, Perfis=['x2'], Comentários=['olá, mt bom']
+2024-11-21 00:38:22,674 - ERROR - Perfil x2 não encontrado!
+2024-11-21 00:40:57,695 - INFO - Script de automação iniciado.
+2024-11-21 00:40:57,696 - INFO - Tarefa carregada: Link=https://vm.tiktok.com/ZMhWHykd4/, Perfis=['x2'], Comentários=['olá, mt bom']
+2024-11-21 00:40:57,696 - ERROR - Perfil x2 não encontrado!
+2024-11-21 00:55:48,244 - INFO - Script de automação iniciado.
+2024-11-21 00:55:48,244 - INFO - Tarefa carregada: Link=https://vm.tiktok.com/ZMhWHykd4/, Perfis=['x2'], Comentários=['olá, mt bom']
+2024-11-21 00:55:48,244 - ERROR - Perfil x2 não encontrado!
+2024-11-21 10:12:07,240 - INFO - Script de automação iniciado.
+2024-11-21 10:12:07,247 - INFO - Tarefa carregada: Link=https://vm.tiktok.com/ZMhWHykd4/, Perfis=['x2'], Comentários=['olá, mt bom']
+2024-11-21 10:12:07,247 - ERROR - Perfil x2 não encontrado!
+2024-11-21 10:41:12,865 - INFO - Script de automação iniciado.
+2024-11-21 10:41:12,872 - INFO - Tarefa carregada: Link=https://www.tiktok.com/@larissa.soouzzaa, Perfis=['x2'], Comentários=['olá, mt bom']
+2024-11-21 10:41:12,873 - ERROR - Perfil x2 não encontrado!
+2024-11-21 10:43:07,082 - INFO - Script de automação iniciado.
+2024-11-21 10:43:07,082 - INFO - Tarefa carregada: Link=https://www.tiktok.com/@larissa.soouzzaa, Perfis=['x2'], Comentários=['olá, mt bom']
+2024-11-21 10:43:07,082 - ERROR - Perfil x2 não encontrado!
+2024-11-21 11:00:20,582 - INFO - Script de automação iniciado.
+2024-11-21 11:00:20,583 - INFO - Tarefa carregada: Link=https://www.tiktok.com/@larissa.soouzzaa, Perfis=['x2'], Comentários=['olá, mt bom']
+2024-11-21 11:00:20,584 - ERROR - Perfil x2 não encontrado!

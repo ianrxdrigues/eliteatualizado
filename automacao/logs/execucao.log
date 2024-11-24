@@ -1,0 +1,30 @@
+2024-11-21 11:25:29,115 - INFO - Script de automação iniciado.
+2024-11-21 11:25:29,116 - INFO - Tarefa carregada: Link=https://vm.tiktok.com/ZMhWHykd4/, Perfis=['Ian'], Comentários=['xxx']
+2024-11-21 11:25:29,126 - INFO - ====== WebDriver manager ======
+2024-11-21 11:25:30,061 - INFO - Get LATEST chromedriver version for google-chrome
+2024-11-21 11:25:30,162 - INFO - Get LATEST chromedriver version for google-chrome
+2024-11-21 11:25:30,240 - INFO - Driver [C:\Users\Ian Rodrigues\.wdm\drivers\chromedriver\win64\131.0.6778.85\chromedriver-win32/chromedriver.exe] found in cache
+2024-11-21 11:25:36,287 - ERROR - Erro ao comentar no perfil Ian: Message: invalid argument: missing 'cookie'
+  (Session info: chrome=131.0.6778.71)
+Stacktrace:
+	GetHandleVerifier [0x010D33E3+25059]
+	(No symbol) [0x0105CDE4]
+	(No symbol) [0x00F3BEC3]
+	(No symbol) [0x00FCB4C7]
+	(No symbol) [0x00FA1EFC]
+	(No symbol) [0x00FBB51E]
+	(No symbol) [0x00FA1C96]
+	(No symbol) [0x00F73FAC]
+	(No symbol) [0x00F74F3D]
+	GetHandleVerifier [0x013C5543+3113795]
+	GetHandleVerifier [0x013DA20A+3198986]
+	GetHandleVerifier [0x013D29E2+3168226]
+	GetHandleVerifier [0x01173250+680016]
+	(No symbol) [0x0106572D]
+	(No symbol) [0x010629D8]
+	(No symbol) [0x01062B75]
+	(No symbol) [0x010557D0]
+	BaseThreadInitThunk [0x76E4FCC9+25]
+	RtlGetAppContainerNamedObjectPath [0x77A0809E+286]
+	RtlGetAppContainerNamedObjectPath [0x77A0806E+238]
+

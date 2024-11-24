@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elite Comments</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        /* Correções para garantir que os botões sejam clicáveis */
+        .btn {
+            position: relative;
+            z-index: 1000;
+            cursor: pointer;
+        }
+
+        .card {
+            position: relative;
+            z-index: 500;
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.3/socket.io.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Elite Comments</h1>
+        </div>
+
+        <!-- Adicionar Perfil -->
+        <div class="card">
+            <h2>Adicionar Perfil</h2>
+            <form id="perfil-form">
+                <div class="form-group">
+                    <label for="name">Nome do Perfil</label>
+                    <input type="text" id="name" required class="form-control" placeholder="Exemplo: perfil1">
+                </div>
+                <div class="form-group">
+                    <label for="cookies">Cookies</label>
+                    <textarea id="cookies" required class="form-control" rows="4" placeholder="Cole aqui os cookies do seu perfil..."></textarea>
+                </div>
+                <button type="button" class="btn" id="save-perfil">Adicionar Perfil</button>
+            </form>
+        </div>
+
+        <!-- Adicionar Comentário -->
+        <div class="card">
+            <h2>Adicionar Comentário</h2>
+            <form id="comentario-form">
+                <div class="form-group">
+                    <label for="comment">Comentário</label>
+                    <textarea id="comment" required class="form-control" rows="4" placeholder="Digite o comentário..."></textarea>
+                </div>
+                <button type="button" class="btn" id="save-comentario">Adicionar Comentário</button>
+            </form>
+        </div>
+
+        <!-- Enviar Comentários -->
+        <div class="card">
+            <h2>Enviar Comentários</h2>
+            <form id="automacao-form">
+                <div class="form-group">
+                    <label for="video_url">URL do Vídeo</label>
+                    <input type="text" id="video_url" required class="form-control" placeholder="https://www.tiktok.com/@usuario/video/1234567890">
+                </div>
+                <div class="form-group">
+                    <label>Selecione os Perfis</label>
+                    <div class="checkbox-group" id="profile-selection">
+                        <!-- Perfis serão adicionados dinamicamente -->
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Selecione os Comentários</label>
+                    <div class="checkbox-group" id="comment-selection">
+                        <!-- Comentários serão adicionados dinamicamente -->
+                    </div>
+                </div>
+                <button type="button" class="btn" id="start-automacao">Enviar Comentários</button>
+            </form>
+        </div>
+
+        <!-- Remover Perfis e Comentários -->
+        <div class="card vertical-card">
+            <h2>Remover Perfis/Comentários</h2>
+            <div class="form-group">
+                <label>Selecione o que deseja Remover</label>
+                <select id="remover-opcao" class="form-control">
+                    <option value="perfil">Perfis</option>
+                    <option value="comentario">Comentários</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Selecione o Item</label>
+                <select id="remover-item" class="form-control">
+                    <!-- Itens adicionados dinamicamente -->
+                </select>
+            </div>
+            <button type="button" class="btn" id="remover-item-btn">Remover</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            let perfis = [];
+            let comentarios = [];
+
+            // Conectar ao WebSocket para receber atualizações de progresso
+            const socket = io.connect('http://' + document.domain + ':' + location.port);
+
+            socket.on('progress_update', function(data) {
+                if (data.status === 'in_progress') {
+                    alert(data.message);
+                } else if (data.status === 'complete') {
+                    alert(data.message);
+                } else if (data.status === 'error') {
+                    alert(data.message);
+                }
+            });
+
+            // Carregar perfis do backend
+            async function carregarPerfis() {
+                try {
+                    const response = await fetch("/listar_perfis");
+                    const dadosPerfis = await response.json();
+                    perfis = dadosPerfis;
+                    atualizarPerfis();
+                } catch (error) {
+                    console.error("Erro ao carregar perfis:", error);
+                }
+            }
+
+            // Atualizar perfis na interface
+            function atualizarPerfis() {
+                const profileSelection = document.getElementById("profile-selection");
+                profileSelection.innerHTML = "";
+                if (perfis.length === 0) {
+                    profileSelection.innerHTML = "<p>Nenhum perfil salvo.</p>";
+                    return;
+                }
+                perfis.forEach(perfil => {
+                    const container = document.createElement("div");
+                    const checkbox = document.createElement("input");
+                    checkbox.type = "checkbox";
+                    checkbox.value = perfil.name;
+                    checkbox.name = "profiles";
+
+                    const label = document.createElement("label");
+                    label.textContent = perfil.name;
+
+                    container.appendChild(checkbox);
+                    container.appendChild(label);
+                    profileSelection.appendChild(container);
+                });
+
+                atualizarItensRemocao("perfil");
+            }
+
+            // Carregar comentários do backend
+            async function carregarComentarios() {
+                try {
+                    const response = await fetch("/listar_comentarios");
+                    const dadosComentarios = await response.json();
+                    comentarios = dadosComentarios;
+                    atualizarComentarios();
+                } catch (error) {
+                    console.error("Erro ao carregar comentários:", error);
+                }
+            }
+
+            // Atualizar comentários na interface
+            function atualizarComentarios() {
+                const commentSelection = document.getElementById("comment-selection");
+                commentSelection.innerHTML = "";
+                if (comentarios.length === 0) {
+                    commentSelection.innerHTML = "<p>Nenhum comentário salvo.</p>";
+                    return;
+                }
+
+                comentarios.forEach(comentario => {
+                    const container = document.createElement("div");
+                    const checkbox = document.createElement("input");
+                    checkbox.type = "checkbox";
+                    checkbox.value = comentario;
+                    checkbox.name = "comments";
+
+                    const label = document.createElement("label");
+                    label.textContent = comentario;
+
+                    container.appendChild(checkbox);
+                    container.appendChild(label);
+                    commentSelection.appendChild(container);
+                });
+
+                atualizarItensRemocao("comentario");
+            }
+
+            // Atualizar itens para remoção
+            function atualizarItensRemocao(tipo) {
+                const itemDropdown = document.getElementById("remover-item");
+                itemDropdown.innerHTML = "";
+                const lista = tipo === "perfil" ? perfis : comentarios;
+
+                lista.forEach(item => {
+                    const option = document.createElement("option");
+                    option.value = tipo === "perfil" ? item.name : item;
+                    option.textContent = tipo === "perfil" ? item.name : item;
+                    itemDropdown.appendChild(option);
+                });
+            }
+
+            // Salvar Perfil
+            document.getElementById("save-perfil").addEventListener("click", async function() {
+                const nome = document.getElementById("name").value;
+                const cookies = document.getElementById("cookies").value;
+
+                if (nome && cookies) {
+                    try {
+                        JSON.parse(cookies);
+                    } catch (e) {
+                        alert("Formato inválido dos cookies. Verifique o JSON fornecido.");
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch("/salvar_perfil", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({ nome, cookies })
+                        });
+
+                        const data = await response.json();
+                        alert(data.message);
+                        carregarPerfis();
+                    } catch (error) {
+                        console.error("Erro ao salvar perfil:", error);
+                    }
+                } else {
+                    alert("Por favor, preencha todos os campos.");
+                }
+            });
+
+            // Salvar Comentário
+            document.getElementById("save-comentario").addEventListener("click", async function() {
+                const comentario = document.getElementById("comment").value;
+
+                if (comentario) {
+                    try {
+                        const response = await fetch("/salvar_comentario", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({ comentario })
+                        });
+
+                        const data = await response.json();
+                        alert(data.message);
+                        carregarComentarios();
+                    } catch (error) {
+                        console.error("Erro ao salvar comentário:", error);
+                    }
+                } else {
+                    alert("Preencha o campo de comentário!");
+                }
+            });
+
+            // Enviar Comentários
+            document.getElementById("start-automacao").addEventListener("click", async function() {
+                const videoUrl = document.getElementById("video_url").value;
+                const selectedPerfis = Array.from(document.querySelectorAll("input[name='profiles']:checked")).map(el => el.value);
+                const selectedComentarios = Array.from(document.querySelectorAll("input[name='comments']:checked")).map(el => el.value);
+
+                if (videoUrl && selectedPerfis.length > 0 && selectedComentarios.length > 0) {
+                    try {
+                        const response = await fetch("/enviar_comentarios", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({ videoUrl, perfis: selectedPerfis, comentarios: selectedComentarios })
+                        });
+
+                        const data = await response.json();
+                        if (data.error) {
+                            alert(`Erro: ${data.error}`);
+                        } else {
+                            alert(data.message);
+                        }
+                    } catch (error) {
+                        console.error("Erro ao enviar comentários:", error);
+                    }
+                } else {
+                    alert("Preencha todos os campos e selecione perfis e comentários!");
+                }
+            });
+
+            // Remover Perfil ou Comentário
+            document.getElementById("remover-item-btn").addEventListener("click", async function() {
+                const tipo = document.getElementById("remover-opcao").value;
+                const nome = document.getElementById("remover-item").value;
+
+                if (nome) {
+                    try {
+                        const response = await fetch(`/remover_item?tipo=${tipo}&nome=${nome}`, {
+                            method: "DELETE"
+                        });
+
+                        const data = await response.json();
+                        alert(data.message);
+                        if (tipo === "perfil") {
+                            carregarPerfis();
+                        } else {
+                            carregarComentarios();
+                        }
+                    } catch (error) {
+                        console.error("Erro ao remover item:", error);
+                    }
+                } else {
+                    alert("Por favor, selecione um item para remover.");
+                }
+            });
+
+            // Inicialização
+            carregarPerfis();
+            carregarComentarios();
+
+            // Atualizar dropdown de remoção quando o tipo mudar
+            document.getElementById("remover-opcao").addEventListener("change", function() {
+                const tipo = this.value;
+                atualizarItensRemocao(tipo);
+            });
+        });
+        
+    </script>
+</body>
+</html>
