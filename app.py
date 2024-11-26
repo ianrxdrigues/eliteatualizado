@@ -389,5 +389,5 @@ def enviar_comentarios():
         logging.exception("Ocorreu um erro inesperado ao tentar enviar comentários.")
         return jsonify({"error": str(e)}), 500
 
-if __name__ == "__main__":
-    socketio.run(app, port=5050, debug=True)
+port = int(os.environ.get("PORT", 5050))  # A porta padrão é 5050, mas será substituída pela variável de ambiente PORT no Heroku
+socketio.run(app, host="0.0.0.0", port=port, debug=True)
