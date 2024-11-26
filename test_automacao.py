@@ -31,7 +31,12 @@ def configurar_navegador():
         "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36"
     )
 
-    driver = webdriver.Chrome(options=options)
+    # Adicionando os caminhos do Chrome e do ChromeDriver instalados via buildpack no Heroku
+    chrome_bin = os.environ.get("GOOGLE_CHROME_BIN", "chromedriver")
+    chrome_driver_path = os.environ.get("CHROMEDRIVER_PATH", "/app/.chromedriver/bin/chromedriver")
+    options.binary_location = chrome_bin
+
+    driver = webdriver.Chrome(executable_path=chrome_driver_path, options=options)
     return driver
 
 
