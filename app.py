@@ -333,7 +333,7 @@ def enviar_comentarios():
             json.dump(tarefa, f)
 
         def run_automation():
-            python_executable = os.path.join(BASE_DIR, 'venv', 'Scripts', 'python.exe')
+            python_executable = os.path.join(BASE_DIR, 'venv', 'bin', 'python')
             script_path = os.path.join(BASE_DIR, "test_automacao.py")
             logging.info(f"Executando o script de automação com o comando: {python_executable} {script_path} {tarefa_path}")
 
