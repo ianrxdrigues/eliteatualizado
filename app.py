@@ -4,6 +4,7 @@ import os
 import json
 import sqlite3
 import subprocess
+import sys
 from flask_socketio import SocketIO
 from werkzeug.security import generate_password_hash, check_password_hash
 from supabase import create_client, Client  # Import para integração com Supabase
@@ -333,7 +334,7 @@ def enviar_comentarios():
             json.dump(tarefa, f)
 
         def run_automation():
-            python_executable = os.path.join(BASE_DIR, 'venv', 'bin', 'python')
+            python_executable = sys.executable
             script_path = os.path.join(BASE_DIR, "test_automacao.py")
             logging.info(f"Executando o script de automação com o comando: {python_executable} {script_path} {tarefa_path}")
 
