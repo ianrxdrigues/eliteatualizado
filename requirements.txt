@@ -13,8 +13,8 @@ gevent==24.11.1
 gevent-websocket==0.10.1
 gotrue==2.10.0
 greenlet==3.1.1
-gunicorn==20.1.0  # Certifique-se de adicionar a versão correta do Gunicorn
-eventlet==0.33.3  # Eventlet é necessário para suportar o Socket.IO em produção
+gunicorn==20.1.0
+gevent==24.1.0  # Substitua pelo Gevent para evitar problemas de compatibilidade
 idna==3.10
 itsdangerous==2.2.0
 Jinja2==3.1.4
