@@ -21,14 +21,19 @@ def configurar_navegador():
     options.add_argument("--ignore-ssl-errors")
     options.add_argument("--disable-notifications")
     options.add_argument("--disable-blink-features=AutomationControlled")
-    options.add_argument("--headless")  # Modo headless para rodar sem interface gráfica
+    options.add_argument("--headless")  # Necessário para rodar sem interface gráfica
+    options.add_argument("--no-sandbox")  # Importante para evitar problemas no Heroku
+    options.add_argument("--disable-dev-shm-usage")  # Reduz a utilização de memória compartilhada
+    options.add_argument("--disable-gpu")  # Desabilita GPU, importante para rodar sem interface gráfica
     options.add_argument("--window-size=1920,1080")  # Define um tamanho fixo para a janela
     options.add_argument("--mute-audio")  # Desativa o áudio para evitar desconforto
     options.add_argument(
         "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36"
     )
+
     driver = webdriver.Chrome(options=options)
     return driver
+
 
 def carregar_cookies(driver, cookies_file):
     try:
