@@ -21,16 +21,16 @@ def configurar_navegador():
     options.add_argument("--ignore-ssl-errors")
     options.add_argument("--disable-notifications")
     options.add_argument("--disable-blink-features=AutomationControlled")
-    options.add_argument("--headless")  # Necessário para rodar sem interface gráfica
-    options.add_argument("--no-sandbox")  # Importante para evitar problemas no Heroku
-    options.add_argument("--disable-dev-shm-usage")  # Reduz a utilização de memória compartilhada
-    options.add_argument("--disable-gpu")  # Desabilita GPU, importante para rodar sem interface gráfica
-    options.add_argument("--remote-debugging-port=9222")  # Adiciona suporte para depuração remota
-    options.add_argument("--disable-extensions")  # Desativa extensões para evitar falhas
-    options.add_argument("--disable-infobars")  # Desativa a barra de informações do Chrome
-    options.add_argument("--disable-setuid-sandbox")  # Para evitar problemas de permissões
-    options.add_argument("--window-size=1920,1080")  # Define um tamanho fixo para a janela
-    options.add_argument("--mute-audio")  # Desativa o áudio para evitar desconforto
+    options.add_argument("--headless")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--remote-debugging-port=9222")
+    options.add_argument("--disable-extensions")
+    options.add_argument("--disable-infobars")
+    options.add_argument("--disable-setuid-sandbox")
+    options.add_argument("--window-size=1920,1080")
+    options.add_argument("--mute-audio")
     options.add_argument(
         "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36"
     )
@@ -38,12 +38,10 @@ def configurar_navegador():
     driver = webdriver.Chrome(options=options)
     return driver
 
-
-
 def carregar_cookies(driver, cookies_file):
     try:
         driver.get("https://www.tiktok.com")
-        time.sleep(5)
+        time.sleep(3)  # Menor tempo para reduzir espera
 
         print(f"Carregando cookies do arquivo: {cookies_file}")
         with open(cookies_file, "r", encoding="utf-8") as file:
@@ -65,7 +63,7 @@ def carregar_cookies(driver, cookies_file):
                 print(f"Cookie adicionado: {cookie}")
 
         driver.get("https://www.tiktok.com")
-        time.sleep(5)  # Esperar o carregamento da página
+        time.sleep(3)  # Reduzido para 3 segundos
 
         # Verifica se a página inicial não possui um link de login
         page_source = driver.page_source
@@ -80,35 +78,33 @@ def carregar_cookies(driver, cookies_file):
 
 def comentar_no_tiktok(driver, url, comentario):
     try_count = 0
-    max_retries = 3
+    max_retries = 2  # Reduzido para 2 tentativas para maior rapidez
 
     while try_count < max_retries:
         try:
             print(f"Acessando a publicação: {url}")
             driver.get(url)
+            time.sleep(5)  # Tempo para garantir o carregamento da página
 
-            campo_comentario_container = WebDriverWait(driver, 15).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, 'div[data-e2e="comment-input"]'))
-            )
-
-            for _ in range(5):
+            # Rolar a página para garantir que o campo de comentário esteja visível
+            for _ in range(7):
                 driver.execute_script("window.scrollBy(0, 300);")
-                time.sleep(random.uniform(0.5, 1.0))
+                time.sleep(random.uniform(0.2, 0.5))  # Menor tempo para agilizar
 
             campo_editavel = WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, 'div[contenteditable="true"]'))
             )
 
             ActionChains(driver).move_to_element(campo_editavel).click().perform()
-            time.sleep(random.uniform(1, 2))
+            time.sleep(random.uniform(0.5, 1.0))
 
             for palavra in comentario.split():
                 campo_editavel.send_keys(palavra + " ")
-                time.sleep(random.uniform(0.3, 0.7))
+                time.sleep(random.uniform(0.1, 0.3))  # Menor intervalo entre palavras
 
-            time.sleep(1)
+            time.sleep(0.5)
             campo_editavel.send_keys(Keys.RETURN)
-            time.sleep(5)
+            time.sleep(3)  # Reduzido para acelerar
 
             # Verificar se o comentário está presente na página após ser enviado
             page_source = driver.page_source
@@ -124,9 +120,9 @@ def comentar_no_tiktok(driver, url, comentario):
             if try_count >= max_retries:
                 print(f"Falha ao enviar o comentário '{comentario}' após {max_retries} tentativas.")
             else:
-                time.sleep(10)  # Espera maior antes de tentar novamente
+                time.sleep(5)  # Espera reduzida antes de tentar novamente
         finally:
-            time.sleep(5)
+            time.sleep(2)  # Reduzido para acelerar
 
 def executar_automacao_por_perfil(perfil, url_publicacao, comentario, progresso_id, total_comentarios):
     try:
@@ -166,7 +162,7 @@ def iniciar_automacao(tarefa_path):
     total_comentarios = len(perfis)
     progresso_id = random.randint(1000, 9999)  # Gerar um ID único para este ciclo de progresso
 
-    tamanho_lote = 1  # Processar um perfil por vez para reduzir sobrecarga
+    tamanho_lote = 2  # Aumentar para 2 perfis por vez para maior velocidade
     for i in range(0, len(perfis), tamanho_lote):
         lote_perfis = perfis[i:i + tamanho_lote]
         lote_comentarios = comentarios[i:i + tamanho_lote]
