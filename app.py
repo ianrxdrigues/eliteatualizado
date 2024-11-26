@@ -388,5 +388,3 @@ def enviar_comentarios():
     except Exception as e:
         logging.exception("Ocorreu um erro inesperado ao tentar enviar comentários.")
         return jsonify({"error": str(e)}), 500
-
-if __name__ == "__main__":
