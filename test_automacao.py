@@ -13,7 +13,7 @@ from socketio import Client
 
 # Inicializar o cliente SocketIO para comunicar com o servidor
 sio = Client()
-sio.connect('http://127.0.0.1:5050/')  # Certifique-se de que o Flask app está rodando nesta porta
+sio.connect('https://elite-comments-0b755ca4ae3a.herokuapp.com')
 
 def configurar_navegador():
     options = webdriver.ChromeOptions()
