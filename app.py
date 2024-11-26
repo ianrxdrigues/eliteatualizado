@@ -1,6 +1,4 @@
-# Importações necessárias
 import logging
-import webbrowser
 from flask import Flask, request, jsonify, render_template, redirect, url_for, session
 import os
 import json
@@ -8,25 +6,25 @@ import sqlite3
 import subprocess
 from flask_socketio import SocketIO
 from werkzeug.security import generate_password_hash, check_password_hash
-from threading import Timer  # Importação necessária para usar o Timer
 from supabase import create_client, Client  # Import para integração com Supabase
 
-# Configuração do Supabase
-SUPABASE_URL = "https://yfgfcdxdhrqsuuxbmclt.supabase.co"  # URL do Supabase
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlmZ2ZjZHhkaHJxc3V1eGJtY2x0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzIzOTIzMzAsImV4cCI6MjA0Nzk2ODMzMH0.Z_nDP9LhACI7u_AMf8l-I-EMHYQd0o-IBTQf6OZLah0"  # Chave da API do Supabase (substitua pela sua chave)
+# Configuração do Supabase usando variáveis de ambiente
+SUPABASE_URL = os.getenv("SUPABASE_URL")  # URL do Supabase
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")  # Chave da API do Supabase
 
 # Inicializando o cliente do Supabase
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+if SUPABASE_URL and SUPABASE_KEY:
+    supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+else:
+    raise ValueError("As variáveis SUPABASE_URL e SUPABASE_KEY não estão definidas")
 
 app = Flask(__name__)
-socketio = SocketIO(app, async_mode='threading')  # Trocar 'eventlet' por 'gevent' para evitar problemas no empacotamento
-app.secret_key = '4e1d2c0a47a6f0a1bc9e9e3b5f6a3a1d5b4e9e3c6a7f8d0b1c5d8f2e9d1c3b7'  # Substitua por uma chave segura
+socketio = SocketIO(app, async_mode='threading')
+app.secret_key = os.getenv('SECRET_KEY', 'default_secret_key')  # Substitua por uma chave segura
 
 # Configuração do logging para ajudar a identificar erros
-logging.basicConfig(level=logging.DEBUG)
-
-# Restante do código...
-
+log_level = os.getenv("LOG_LEVEL", "DEBUG")
+logging.basicConfig(level=getattr(logging, log_level.upper(), logging.DEBUG))
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DADOS_DIR = os.path.join(BASE_DIR, "dados")
@@ -39,6 +37,7 @@ os.makedirs(PERFIS_DIR, exist_ok=True)
 if not os.path.exists(COMENTARIOS_FILE):
     with open(COMENTARIOS_FILE, "w") as f:
         json.dump([], f)
+
 
 # Função auxiliar para acessar o banco de dados
 def get_db_connection():
@@ -58,7 +57,7 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        hashed_password = generate_password_hash(password, method='sha256')
+        hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
 
         # Tentando registrar o usuário no Supabase
         try:
@@ -85,13 +84,11 @@ def login():
         # Busca o usuário no Supabase
         try:
             response = supabase.table("usuarios").select("*").eq("username", username).execute()
-            print(f"Resposta da Supabase: {response}")  # Adicione esta linha para depuração
-
             user = response.data[0] if response.data else None
 
             if user:
                 if check_password_hash(user['password'], password):
-                    session['user_id'] = user['uid']  # Corrigi para usar o 'uid' ao invés de 'id'
+                    session['user_id'] = user['username']  # Usar o 'username' como identificador de sessão
                     logging.info(f"Usuário '{username}' logado com sucesso.")
                     return redirect(url_for('index'))
                 else:
@@ -126,39 +123,45 @@ def salvar_perfil():
         return jsonify({"error": "Nome do perfil e cookies são obrigatórios."}), 400
 
     try:
+        # Limpar o nome do perfil, removendo espaços e caracteres especiais
+        nome_limpo = nome.replace(" ", "_")
         cookies_data = json.loads(cookies)
-        logging.debug(f"Cookies recebidos para o perfil '{nome}': {cookies_data}")
+        logging.debug(f"Cookies recebidos para o perfil '{nome_limpo}': {cookies_data}")
     except json.JSONDecodeError as e:
         logging.error(f"Erro ao decodificar cookies: {e}")
         return jsonify({"error": "Formato inválido dos cookies. Verifique o JSON fornecido."}), 400
 
-    perfil_path = os.path.join(PERFIS_DIR, f"{nome}.json")
+    user_dir = os.path.join(PERFIS_DIR, f"usuario_{session['user_id']}")
+    perfil_path = os.path.join(user_dir, f"{nome_limpo}.json")
 
     if not cookies_data:
         logging.error("Dados dos cookies estão vazios. Não será salvo.")
         return jsonify({"error": "Os cookies fornecidos estão vazios."}), 400
 
     try:
+        os.makedirs(user_dir, exist_ok=True)
         with open(perfil_path, "w") as f:
             json.dump(cookies_data, f, indent=4)
-            logging.info(f"Perfil '{nome}' salvo com sucesso.")
+            logging.info(f"Perfil '{nome_limpo}' salvo com sucesso.")
     except Exception as e:
-        logging.error(f"Erro ao salvar o perfil '{nome}': {e}")
+        logging.error(f"Erro ao salvar o perfil '{nome_limpo}': {e}")
         return jsonify({"error": f"Erro ao salvar o perfil: {str(e)}"}), 500
 
-    return jsonify({"message": f"Perfil {nome} salvo com sucesso!"})
+    return jsonify({"message": f"Perfil {nome_limpo} salvo com sucesso!"})
 
 @app.route("/listar_perfis", methods=["GET"])
 def listar_perfis():
     if 'user_id' not in session:
         return redirect(url_for('login'))
 
+    user_dir = os.path.join(PERFIS_DIR, f"usuario_{session['user_id']}")
     perfis = []
 
-    if os.path.exists(PERFIS_DIR):
-        for perfil_file in os.listdir(PERFIS_DIR):
-            if perfil_file.endswith(".json"):
-                perfil_path = os.path.join(PERFIS_DIR, perfil_file)
+    if os.path.exists(user_dir):
+        for perfil_file in os.listdir(user_dir):
+            # Verifica se o arquivo termina com '.json' e não é 'comentarios.json'
+            if perfil_file.endswith(".json") and perfil_file != "comentarios.json":
+                perfil_path = os.path.join(user_dir, perfil_file)
                 try:
                     with open(perfil_path, "r") as file:
                         conteudo = file.read().strip()
@@ -190,15 +193,27 @@ def salvar_comentario():
     data = request.json
     comentario = data.get("comentario")
 
-    if os.path.exists(COMENTARIOS_FILE):
-        with open(COMENTARIOS_FILE, "r") as f:
+    # Definir o caminho da pasta do usuário e do arquivo de comentários
+    user_dir = os.path.join(PERFIS_DIR, f"usuario_{session['user_id']}")
+    comentarios_file = os.path.join(user_dir, "comentarios.json")
+
+    if not comentario:
+        return jsonify({"error": "Comentário não pode estar vazio."}), 400
+
+    # Cria o diretório do usuário se não existir
+    os.makedirs(user_dir, exist_ok=True)
+
+    # Carrega os comentários existentes ou cria uma lista vazia se não existir
+    if os.path.exists(comentarios_file):
+        with open(comentarios_file, "r") as f:
             comentarios = json.load(f)
     else:
         comentarios = []
 
+    # Adiciona o novo comentário e salva no arquivo do usuário
     comentarios.append(comentario)
-    with open(COMENTARIOS_FILE, "w") as f:
-        json.dump(comentarios, f)
+    with open(comentarios_file, "w") as f:
+        json.dump(comentarios, f, indent=4, ensure_ascii=False)
 
     return jsonify({"message": "Comentário salvo com sucesso!"})
 
@@ -207,13 +222,20 @@ def listar_comentarios():
     if 'user_id' not in session:
         return redirect(url_for('login'))
 
-    if os.path.exists(COMENTARIOS_FILE):
-        with open(COMENTARIOS_FILE, "r") as f:
+    # Definir o caminho da pasta do usuário e do arquivo de comentários
+    user_dir = os.path.join(PERFIS_DIR, f"usuario_{session['user_id']}")
+    comentarios_file = os.path.join(user_dir, "comentarios.json")
+
+    # Carrega os comentários existentes ou cria uma lista vazia se não existir
+    if os.path.exists(comentarios_file):
+        with open(comentarios_file, "r") as f:
             comentarios = json.load(f)
     else:
         comentarios = []
 
     return jsonify(comentarios)
+
+import logging
 
 @app.route("/remover_item", methods=["DELETE"])
 def remover_item():
@@ -223,31 +245,54 @@ def remover_item():
     tipo = request.args.get("tipo")
     nome = request.args.get("nome")
 
-    if tipo == "perfil":
-        perfil_path = os.path.join(PERFIS_DIR, f"{nome}.json")
-        if os.path.exists(perfil_path):
-            os.remove(perfil_path)
-            return jsonify({"message": f"Perfil '{nome}' removido com sucesso!"})
-        else:
-            return jsonify({"error": f"Perfil '{nome}' não encontrado."}), 404
+    # Obtém o diretório do usuário logado
+    user_dir = os.path.join(PERFIS_DIR, f"usuario_{session['user_id']}")
+    logging.debug(f"Diretório do usuário logado: {user_dir}")
 
-    elif tipo == "comentario":
-        if os.path.exists(COMENTARIOS_FILE):
-            with open(COMENTARIOS_FILE, "r") as f:
-                comentarios = json.load(f)
+    try:
+        if tipo == "perfil":
+            # Define o caminho do perfil a ser removido
+            perfil_path = os.path.join(user_dir, f"{nome}.json")
+            logging.debug(f"Caminho do perfil a ser removido: {perfil_path}")
 
-            if nome in comentarios:
-                comentarios.remove(nome)
-                with open(COMENTARIOS_FILE, "w") as f:
-                    json.dump(comentarios, f)
-
-                return jsonify({"message": f"Comentário '{nome}' removido com sucesso!"})
+            if os.path.exists(perfil_path):
+                os.remove(perfil_path)
+                logging.info(f"Perfil '{nome}' removido com sucesso!")
+                return jsonify({"message": f"Perfil '{nome}' removido com sucesso!"})
             else:
-                return jsonify({"error": f"Comentário '{nome}' não encontrado."}), 404
-        else:
-            return jsonify({"error": "Arquivo de comentários não encontrado."}), 404
+                logging.error(f"Perfil '{nome}' não encontrado no caminho '{perfil_path}'.")
+                return jsonify({"error": f"Perfil '{nome}' não encontrado."}), 404
 
-    return jsonify({"error": "Tipo inválido para remoção."}), 400
+        elif tipo == "comentario":
+            comentarios_file = os.path.join(user_dir, "comentarios.json")
+            logging.debug(f"Caminho do arquivo de comentários: {comentarios_file}")
+
+            if os.path.exists(comentarios_file):
+                with open(comentarios_file, "r") as f:
+                    comentarios = json.load(f)
+
+                if nome in comentarios:
+                    comentarios.remove(nome)
+                    with open(comentarios_file, "w") as f:
+                        json.dump(comentarios, f)
+                    logging.info(f"Comentário '{nome}' removido com sucesso!")
+                    return jsonify({"message": f"Comentário '{nome}' removido com sucesso!"})
+                else:
+                    logging.error(f"Comentário '{nome}' não encontrado no arquivo de comentários.")
+                    return jsonify({"error": f"Comentário '{nome}' não encontrado."}), 404
+            else:
+                logging.error(f"Arquivo de comentários não encontrado no caminho '{comentarios_file}'.")
+                return jsonify({"error": "Arquivo de comentários não encontrado."}), 404
+
+        else:
+            logging.error("Tipo inválido para remoção: " + str(tipo))
+            return jsonify({"error": "Tipo inválido para remoção."}), 400
+
+    except Exception as e:
+        logging.error(f"Erro ao remover o item '{nome}' do tipo '{tipo}': {e}")
+        return jsonify({"error": f"Erro ao remover o item: {str(e)}"}), 500
+
+
 
 @app.route("/enviar_comentarios", methods=["POST"])
 def enviar_comentarios():
@@ -264,12 +309,26 @@ def enviar_comentarios():
             logging.error("Dados incompletos para enviar comentários.")
             return jsonify({"error": "Dados incompletos para enviar comentários."}), 400
 
+        # Atualiza o caminho para os perfis baseado no usuário logado
+        user_id = session['user_id']
+        user_dir = os.path.join(PERFIS_DIR, f"usuario_{user_id}")
+
+        # Corrigir o caminho dos perfis, evitando duplicação do ".json"
+        perfis_paths = []
+        for perfil in perfis:
+           perfil_path = os.path.join(user_dir, f"{perfil}.json")
+           perfis_paths.append(perfil_path)
+
+
+        # Atualiza o objeto de tarefa com os caminhos corrigidos dos perfis
         tarefa = {
             "link": video_url,
             "comentarios": comentarios,
-            "perfis": perfis
+            "perfis": perfis_paths
         }
-        tarefa_path = os.path.join(BASE_DIR, "tarefa_temp.json")
+
+        # Criar um arquivo de tarefa único para cada usuário
+        tarefa_path = os.path.join(BASE_DIR, f"tarefa_temp_{user_id}.json")
         with open(tarefa_path, "w") as f:
             json.dump(tarefa, f)
 
@@ -312,15 +371,22 @@ def enviar_comentarios():
         logging.exception("Ocorreu um erro inesperado ao tentar enviar comentários.")
         return jsonify({"error": str(e)}), 500
 
+
+    except Exception as e:
+        logging.exception("Ocorreu um erro inesperado ao tentar enviar comentários.")
+        return jsonify({"error": str(e)}), 500
+
+    except Exception as e:
+        logging.exception("Ocorreu um erro inesperado ao tentar enviar comentários.")
+        return jsonify({"error": str(e)}), 500
+
+    except Exception as e:
+        logging.exception("Ocorreu um erro inesperado ao tentar enviar comentários.")
+        return jsonify({"error": str(e)}), 500
+
+    except Exception as e:
+        logging.exception("Ocorreu um erro inesperado ao tentar enviar comentários.")
+        return jsonify({"error": str(e)}), 500
+
 if __name__ == "__main__":
-    # Função para abrir o navegador após um pequeno atraso
-    def abrir_navegador():
-        webbrowser.open("http://127.0.0.1:5000/login")
-
-    # Timer para abrir o navegador após 1 segundo
-    Timer(1, abrir_navegador).start()
-
-    # Iniciar o servidor Flask
-    socketio.run(app, host="127.0.0.1", port=5000, debug=False)
-
-
+    socketio.run(app, port=5050, debug=True)

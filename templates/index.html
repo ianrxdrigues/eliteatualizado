@@ -302,30 +302,38 @@
             });
 
             // Remover Perfil ou Comentário
-            document.getElementById("remover-item-btn").addEventListener("click", async function() {
-                const tipo = document.getElementById("remover-opcao").value;
-                const nome = document.getElementById("remover-item").value;
+document.getElementById("remover-item-btn").addEventListener("click", async function() {
+    const tipo = document.getElementById("remover-opcao").value;
+    const nome = document.getElementById("remover-item").value;
 
-                if (nome) {
-                    try {
-                        const response = await fetch(`/remover_item?tipo=${tipo}&nome=${nome}`, {
-                            method: "DELETE"
-                        });
-
-                        const data = await response.json();
-                        alert(data.message);
-                        if (tipo === "perfil") {
-                            carregarPerfis();
-                        } else {
-                            carregarComentarios();
-                        }
-                    } catch (error) {
-                        console.error("Erro ao remover item:", error);
-                    }
-                } else {
-                    alert("Por favor, selecione um item para remover.");
-                }
+    if (nome) {
+        try {
+            const response = await fetch(`/remover_item?tipo=${tipo}&nome=${nome}`, {
+                method: "DELETE"
             });
+
+            const data = await response.json();
+            if (response.ok) {
+                // Verifica se a resposta foi bem-sucedida (HTTP 200-299)
+                alert(data.message);
+                if (tipo === "perfil") {
+                    carregarPerfis();
+                } else {
+                    carregarComentarios();
+                }
+            } else {
+                // Caso contrário, exibe o erro retornado pelo servidor
+                alert(`Erro: ${data.error}`);
+            }
+        } catch (error) {
+            console.error("Erro ao remover item:", error);
+            alert("Erro ao tentar remover o item. Por favor, tente novamente.");
+        }
+    } else {
+        alert("Por favor, selecione um item para remover.");
+    }
+});
+
 
             // Inicialização
             carregarPerfis();

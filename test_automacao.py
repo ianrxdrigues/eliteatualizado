@@ -13,7 +13,7 @@ from socketio import Client
 
 # Inicializar o cliente SocketIO para comunicar com o servidor
 sio = Client()
-sio.connect('http://127.0.0.1:5000/')  # Certifique-se de que o Flask app está rodando nesta porta
+sio.connect('http://127.0.0.1:5050/')  # Certifique-se de que o Flask app está rodando nesta porta
 
 def configurar_navegador():
     options = webdriver.ChromeOptions()
@@ -121,7 +121,7 @@ def comentar_no_tiktok(driver, url, comentario):
 def executar_automacao_por_perfil(perfil, url_publicacao, comentario, progresso_id, total_comentarios):
     try:
         driver = configurar_navegador()
-        cookies_file = os.path.join("dados", "perfis", f"{perfil}.json")
+        cookies_file = perfil  # O valor de 'perfil' já contém o caminho completo com a extensão correta
         carregar_cookies(driver, cookies_file)
 
         comentar_no_tiktok(driver, url_publicacao, comentario)
